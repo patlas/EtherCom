@@ -1,0 +1,4 @@
+--create debug\ksdk_startup_lib.lib
+debug\startup_mk64f12.o
+debug\system_mk64f12.o
+debug\startup.o

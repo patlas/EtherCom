@@ -1,0 +1,116 @@
+Dependencies for Project 'ksdk_startup_lib', Target 'ksdk_startup_lib Debug': (DO NOT MODIFY !)
+F (../../../../platform/startup/MK64F12/arm/startup_MK64F12.s)(0x53BD997D)(--cpu Cortex-M4.fp --pd "__EVAL SETA 1" -g --apcs=interwork --pd "__MICROLIB SETA 1" --cpreproc --diag_suppress=1609,1581 -I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis--pd "DEBUG SETA 1"--list .\output\startup_mk64f12.lst -o debug\startup_mk64f12.o --depend debug\startup_mk64f12.d)
+F (../../../../platform/startup/MK64F12/system_MK64F12.c)(0x53BD997D)(-c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork -I../../../../platform/startup/MK64F12 -I../../../../platform/CMSIS/Include --library_interface=armcc  --library_type=standardlib --c99 --diag_suppress=1296,186-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DDEBUG -DCPU_MK64FN1M0VMD12 -DKEIL-o debug\system_mk64f12.o --depend debug\system_mk64f12.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5419E3CA)
+I (../../../../platform/CMSIS/Include/device/fsl_device_registers.h)(0x53BD997B)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/core_cm4.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/core_cmInstr.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/core_cmFunc.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/core_cm4_simd.h)(0x53BD997A)
+I (../../../../platform/startup/MK64F12/system_MK64F12.h)(0x53BD997D)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_adc.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/fsl_bitaccess.h)(0x53BD997A)
+I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x5419E3CC)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_aips.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_axbs.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_can.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_cau.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_cmp.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_cmt.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_crc.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_dac.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_dma.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_dmamux.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_enet.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_ewm.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_fb.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_fmc.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_ftfe.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_ftm.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_gpio.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_i2c.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_i2s.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_llwu.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_lptmr.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_mcg.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_mcm.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_mpu.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_nv.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_osc.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_pdb.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_pit.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_pmc.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_port.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_rcm.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_rfsys.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_rfvbat.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_rng.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_rtc.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_sdhc.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_sim.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_smc.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_spi.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_uart.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_usb.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_usbdcd.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_vref.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_wdog.h)(0x53BD997A)
+F (../../../../platform/startup/startup.c)(0x53BD997D)(-c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork -I../../../../platform/startup/MK64F12 -I../../../../platform/CMSIS/Include --library_interface=armcc  --library_type=standardlib --c99 --diag_suppress=1296,186-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DDEBUG -DCPU_MK64FN1M0VMD12 -DKEIL-o debug\startup.o --depend debug\startup.d)
+I (../../../../platform/startup/startup.h)(0x53BD997D)
+I (../../../../platform/CMSIS/Include/device/fsl_device_registers.h)(0x53BD997B)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12.h)(0x53BD997A)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5419E3CA)
+I (../../../../platform/CMSIS/Include/core_cm4.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/core_cmInstr.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/core_cmFunc.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/core_cm4_simd.h)(0x53BD997A)
+I (../../../../platform/startup/MK64F12/system_MK64F12.h)(0x53BD997D)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_adc.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/fsl_bitaccess.h)(0x53BD997A)
+I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x5419E3CC)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_aips.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_axbs.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_can.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_cau.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_cmp.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_cmt.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_crc.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_dac.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_dma.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_dmamux.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_enet.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_ewm.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_fb.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_fmc.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_ftfe.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_ftm.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_gpio.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_i2c.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_i2s.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_llwu.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_lptmr.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_mcg.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_mcm.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_mpu.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_nv.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_osc.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_pdb.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_pit.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_pmc.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_port.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_rcm.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_rfsys.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_rfvbat.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_rng.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_rtc.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_sdhc.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_sim.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_smc.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_spi.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_uart.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_usb.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_usbdcd.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_vref.h)(0x53BD997A)
+I (../../../../platform/CMSIS/Include/device/MK64F12/MK64F12_wdog.h)(0x53BD997A)
+F (../../../../platform/startup/startup.h)(0x53BD997D)()
