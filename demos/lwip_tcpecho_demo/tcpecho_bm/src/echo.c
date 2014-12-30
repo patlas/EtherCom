@@ -43,6 +43,7 @@
 //#include "MK64F12.h"
 
 #include "lwip/opt.h"
+#include "CircBuf.h"
 
 #if LWIP_TCP
 #include <stdio.h>
@@ -70,8 +71,15 @@
 uint32_t portBaseAddr[] = PORT_BASE_ADDRS;
 uint32_t simBaseAddr[] = SIM_BASE_ADDRS;
 
-static struct tcp_pcb *echo_pcb;
 
+uint8_t buffA[ABSIZE];
+uint8_t buffB[ABSIZE];
+HBuffer HalfBuffTx;
+HBuffer HalfBuffRx;
+uint8_t tx_buffer[TX_BUFFER_SIZE];
+
+static struct tcp_pcb *echo_pcb;
+char XX[] = "012";
 enum echo_states
 {
   ES_NONE = 0,
@@ -97,6 +105,8 @@ err_t echo_sent(void *arg, struct tcp_pcb *tpcb, u16_t len);
 void echo_send(struct tcp_pcb *tpcb, struct echo_state *es);
 void echo_close(struct tcp_pcb *tpcb, struct echo_state *es);
 
+void TCP_UART_send(struct tcp_pcb *tpcb, struct echo_state *es);
+err_t TCP_UART_sent(void *arg, struct tcp_pcb *tpcb, u16_t len);
 void
 echo_init(void)
 {
@@ -110,6 +120,7 @@ echo_init(void)
     {
       echo_pcb = tcp_listen(echo_pcb);
       tcp_accept(echo_pcb, echo_accept);
+			UART_DRV_InstallRxCallback(BOARD_DEBUG_UART_INSTANCE,ReadUARTdata, NULL);
     }
     else 
     {
@@ -178,8 +189,10 @@ echo_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
     else
     {
       /* we're not done yet */
-      tcp_sent(tpcb, echo_sent);
-      echo_send(tpcb, es);
+      //tcp_sent(tpcb, echo_sent);
+      //echo_send(tpcb, es);
+			
+			tcp_write(tpcb, &XX[0], 1, 1);
     }
     ret_err = ERR_OK;
   }
@@ -200,8 +213,11 @@ echo_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
     /* store reference to incoming pbuf (chain) */
     es->p = p;
     /* install send completion notifier */
-    tcp_sent(tpcb, echo_sent);
-    echo_send(tpcb, es);
+    //tcp_sent(tpcb, TCP_UART_sent);
+    //echo_send(tpcb, es);
+		//tcp_write(tpcb, &XX[1], 2, 1);
+		UART_DRV_SendData ( BOARD_DEBUG_UART_INSTANCE, es->p->payload,es->p->len);
+		//tutaj tylko odebrac dane do konfiguracji interface'u i nie robic nic wiecej -> powyzsze usunac
     ret_err = ERR_OK;
   }
   else if (es->state == ES_RECEIVED)
@@ -210,8 +226,9 @@ echo_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
     if(es->p == NULL)
     {
       es->p = p;
-      tcp_sent(tpcb, echo_sent);
-      echo_send(tpcb, es);
+      tcp_sent(tpcb, TCP_UART_sent);
+      //echo_send(tpcb, es);
+			TCP_UART_send(tpcb, es);
     }
     else
     {
@@ -366,6 +383,86 @@ echo_send(struct tcp_pcb *tpcb, struct echo_state *es)
   }
 }
 
+void TCP_UART_send(struct tcp_pcb *tpcb, struct echo_state *es)
+{
+  struct pbuf *ptr;
+  err_t wr_err = ERR_OK;
+ 
+  while ((wr_err == ERR_OK) &&
+         (es->p != NULL) && 
+         (es->p->len <= tcp_sndbuf(tpcb)))
+  {
+  ptr = es->p;
+
+  /* enqueue data for transmission */
+  //wr_err = tcp_write(tpcb, ptr->payload, ptr->len, 1);
+	//UART_DRV_SendData ( BOARD_DEBUG_UART_INSTANCE, es->p->payload,es->p->len);
+	UART_DRV_SendDataBlocking(BOARD_DEBUG_UART_INSTANCE, es->p->payload, es->p->len, 200);
+  if (wr_err == ERR_OK)
+  {
+     u16_t plen;
+      u8_t freed;
+
+     plen = ptr->len;
+     /* continue with next pbuf in chain (if any) */
+     es->p = ptr->next;
+     if(es->p != NULL)
+     {
+       /* new reference! */
+       pbuf_ref(es->p);
+     }
+     /* chop first pbuf from chain */
+      do
+      {
+        /* try hard to free pbuf */
+        freed = pbuf_free(ptr);
+      }
+      while(freed == 0);
+     /* we can read more data now */
+     tcp_recved(tpcb, plen);
+   }
+   else if(wr_err == ERR_MEM)
+   {
+      /* we are low on memory, try later / harder, defer to poll */
+     es->p = ptr;
+   }
+   else
+   {
+     /* other problem ?? */
+   }
+  }
+}
+
+
+err_t
+TCP_UART_sent(void *arg, struct tcp_pcb *tpcb, u16_t len)
+{
+  struct echo_state *es;
+
+  LWIP_UNUSED_ARG(len);
+
+  es = (struct echo_state *)arg;
+  es->retries = 0;
+  
+  if(es->p != NULL)
+  {
+    /* still got pbufs to send */
+    tcp_sent(tpcb, TCP_UART_sent);
+    TCP_UART_send(tpcb, es);
+  }
+  else
+  {
+    /* no more pbufs to send */
+    if(es->state == ES_CLOSING)
+    {
+      echo_close(tpcb, es);
+    }
+  }
+  return ERR_OK;
+}
+
+
+
 void
 echo_close(struct tcp_pcb *tpcb, struct echo_state *es)
 {
@@ -383,6 +480,16 @@ echo_close(struct tcp_pcb *tpcb, struct echo_state *es)
 }
 
 #endif /* LWIP_TCP */
+
+void UART_rcv_callback(void){
+	
+	
+	
+	
+	
+}
+
+
 
 /*Add by myself*/
 void init_hardware(void)
@@ -403,10 +510,29 @@ void init_hardware(void)
 
 int main(void)
 {
+	const unsigned char AA[] = "PAT";
   struct netif fsl_netif0;
   ip_addr_t fsl_netif0_ipaddr, fsl_netif0_netmask, fsl_netif0_gw;
   init_hardware();
+	
+	/***********************************************/
+	uart_user_config_t uartConfig;
+	uartConfig.baudRate = 115200;
+	uartConfig.bitCountPerChar = kUart8BitsPerChar;
+	uartConfig.parityMode = kUartParityDisabled;
+	uartConfig.stopBitCount = kUartOneStopBit;
+	uart_state_t uartState;
+	/**********************************************/
+	
+	
   OSA_Init();
+/****************************************************/	
+	UART_DRV_Init(BOARD_DEBUG_UART_INSTANCE, &uartState, &uartConfig);
+
+	UART_DRV_SendDataBlocking(BOARD_DEBUG_UART_INSTANCE, AA, 3, 
+                                  200);
+/***************************************************/	
+	
   lwip_init();
   IP4_ADDR(&fsl_netif0_ipaddr, 192,168,2,102);
   IP4_ADDR(&fsl_netif0_netmask, 255,255,255,0);
@@ -414,7 +540,16 @@ int main(void)
   netif_add(&fsl_netif0, &fsl_netif0_ipaddr, &fsl_netif0_netmask, &fsl_netif0_gw, NULL, ethernetif_init, ethernet_input);
   netif_set_default(&fsl_netif0);
   netif_set_up(&fsl_netif0);
+	
+	HalfBuffInit();
   echo_init();
+	
+	
+
+
+	
+	
+	
 #if !ENET_RECEIVE_ALL_INTERRUPT
 	uint32_t devNumber = 0; 
 	enet_dev_if_t * enetIfPtr;
