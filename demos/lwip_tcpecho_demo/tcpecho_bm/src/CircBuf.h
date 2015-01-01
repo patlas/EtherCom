@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#include "TimeoutTimer.h"
 
 
 
@@ -33,6 +34,7 @@ extern HBuffer HalfBuffRx;
 void DMA_startTX(void);
 
 void ReadUARTdata(void);
+void HalfBuffInit(void);
 
 
 

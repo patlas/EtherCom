@@ -44,6 +44,7 @@
 
 #include "lwip/opt.h"
 #include "CircBuf.h"
+#include "TimeoutTimer.h"
 
 #if LWIP_TCP
 #include <stdio.h>
@@ -68,6 +69,10 @@
 #include "fsl_os_abstraction.h"
 #include "ethernetif.h"
 #include "board.h"
+#include "fsl_pit_driver.h"
+
+//#include "api.h"
+
 uint32_t portBaseAddr[] = PORT_BASE_ADDRS;
 uint32_t simBaseAddr[] = SIM_BASE_ADDRS;
 
@@ -79,7 +84,9 @@ HBuffer HalfBuffRx;
 uint8_t tx_buffer[TX_BUFFER_SIZE];
 
 static struct tcp_pcb *echo_pcb;
-char XX[] = "012";
+
+char XX[3] = "012";
+volatile uint8_t tx_flag=0;
 enum echo_states
 {
   ES_NONE = 0,
@@ -107,6 +114,13 @@ void echo_close(struct tcp_pcb *tpcb, struct echo_state *es);
 
 void TCP_UART_send(struct tcp_pcb *tpcb, struct echo_state *es);
 err_t TCP_UART_sent(void *arg, struct tcp_pcb *tpcb, u16_t len);
+uart_status_t UART_rcv_callback(uint8_t * rxByte, void * param);
+
+void connection_init(void);
+
+void ReadInPoll(struct tcp_pcb *tpcb);
+
+
 void
 echo_init(void)
 {
@@ -120,7 +134,7 @@ echo_init(void)
     {
       echo_pcb = tcp_listen(echo_pcb);
       tcp_accept(echo_pcb, echo_accept);
-			UART_DRV_InstallRxCallback(BOARD_DEBUG_UART_INSTANCE,ReadUARTdata, NULL);
+			
     }
     else 
     {
@@ -159,7 +173,7 @@ echo_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
     tcp_arg(newpcb, es);
     tcp_recv(newpcb, echo_recv);
     tcp_err(newpcb, echo_error);
-    tcp_poll(newpcb, echo_poll, 0);
+    tcp_poll(newpcb, echo_poll, 0/*0*/);
     ret_err = ERR_OK;
   }
   else
@@ -279,6 +293,19 @@ echo_poll(void *arg, struct tcp_pcb *tpcb)
   err_t ret_err;
   struct echo_state *es;
 
+	/*if( (UART0->S1 & UART_S1_RDRF_MASK) == UART_S1_RDRF_MASK)
+		tcp_write(echo_pcb, XX, 2, 1);
+*/
+	
+	/*if(tx_flag ==1){
+		tcp_write(tpcb, XX, 2, 1);
+		tx_flag=0;
+		//NVIC_EnableIRQ(UART0_RX_TX_IRQn);
+	}*/
+	
+	ReadInPoll(tpcb);
+	
+	
   es = (struct echo_state *)arg;
   if (es != NULL)
   {
@@ -293,7 +320,8 @@ echo_poll(void *arg, struct tcp_pcb *tpcb)
       /* no remaining pbuf (chain)  */
       if(es->state == ES_CLOSING)
       {
-        echo_close(tpcb, es);
+        //echo_close(tpcb, es);
+				GPIO_DRV_TogglePinOutput(BOARD_GPIO_LED_RED);
       }
     }
     ret_err = ERR_OK;
@@ -304,6 +332,7 @@ echo_poll(void *arg, struct tcp_pcb *tpcb)
     tcp_abort(tpcb);
     ret_err = ERR_ABRT;
   }
+	GPIO_DRV_TogglePinOutput(BOARD_GPIO_LED_RED);
   return ret_err;
 }
 
@@ -466,7 +495,7 @@ TCP_UART_sent(void *arg, struct tcp_pcb *tpcb, u16_t len)
 void
 echo_close(struct tcp_pcb *tpcb, struct echo_state *es)
 {
-  tcp_arg(tpcb, NULL);
+  /*tcp_arg(tpcb, NULL);
   tcp_sent(tpcb, NULL);
   tcp_recv(tpcb, NULL);
   tcp_err(tpcb, NULL);
@@ -476,18 +505,10 @@ echo_close(struct tcp_pcb *tpcb, struct echo_state *es)
   {
     mem_free(es);
   }  
-  tcp_close(tpcb);
+  tcp_close(tpcb);*/
 }
 
 #endif /* LWIP_TCP */
-
-void UART_rcv_callback(void){
-	
-	
-	
-	
-	
-}
 
 
 
@@ -508,9 +529,66 @@ void init_hardware(void)
     BW_MPU_CESR_VLD(MPU_BASE, 0);
 }
 
+
+
+
+
+void ReadInPoll(struct tcp_pcb *tpcb){
+	
+	/*if( (UART0->S1 & UART_S1_RDRF_MASK) == UART_S1_RDRF_MASK){
+		ReadUARTdata();
+		tcp_write(tpcb, XX, 2, 1);
+			
+	}*/
+	
+	if(tx_flag==1)
+	{
+		tcp_write(tpcb, XX, 2, 1);
+
+		tcp_write(tpcb,tx_buffer,HalfBuffTx.read_size,1);
+		tx_flag = 0;
+	}
+		
+	
+	
+}
+
+/*OSA_TASK_DEFINE(TaskWait4uart, 100);
+static task_handler_t TaskWait4Uart_handler;
+task_stack_t *Wait4Uart_stack;
+*/
+/*
+struct netconn *xNetConn;
+struct netconn *xNewConn;
+void connection_init(void)
+{
+
+	xNetConn = netconn_new ( NETCONN_TCP ); //jest funkcja do callbacka po inicie
+	
+	if(xNetConn != NULL){
+		netconn_bind   ( xNetConn, IP_ADDR_ANY, 7 );
+		netconn_listen ( xNetConn );
+	}
+	
+	while ( 1 )
+	{
+   if( netconn_accept( xNetConn, &xNewConn )!=ERR_OK )
+      continue;
+	
+	 const uint8_t XY[] = "ASDF";
+	 netconn_write ( xNewConn, XY, 1, NETCONN_NOCOPY  );
+	// netconn_write ( xNewConn, &XY[1], 1, NETCONN_NOCOPY  );
+   //NetConnServeClient ( xNewConn );  // process client request
+   netconn_delete     ( xNewConn );
+	}
+}
+*/
+
+
 int main(void)
 {
 	const unsigned char AA[] = "PAT";
+	uint8_t BB[2];
   struct netif fsl_netif0;
   ip_addr_t fsl_netif0_ipaddr, fsl_netif0_netmask, fsl_netif0_gw;
   init_hardware();
@@ -528,9 +606,11 @@ int main(void)
   OSA_Init();
 /****************************************************/	
 	UART_DRV_Init(BOARD_DEBUG_UART_INSTANCE, &uartState, &uartConfig);
+	//UART_DRV_InstallRxCallback(BOARD_DEBUG_UART_INSTANCE, UART_rcv_callback, NULL);
 
-	UART_DRV_SendDataBlocking(BOARD_DEBUG_UART_INSTANCE, AA, 3, 
-                                  200);
+	UART_DRV_SendDataBlocking(BOARD_DEBUG_UART_INSTANCE, AA, 3, 200);
+																	
+	//UART_DRV_ReceiveData	(	BOARD_DEBUG_UART_INSTANCE,BB,1);
 /***************************************************/	
 	
   lwip_init();
@@ -543,8 +623,34 @@ int main(void)
 	
 	HalfBuffInit();
   echo_init();
+
 	
+	TO_Timer_init(10); //10ms data timeout ewentualnie przeliczac ze wzgledu na baud rate -> mozna wewnatrz funkcji
 	
+	/*NVIC_EnableIRQ(UART0_RX_TX_IRQn);
+	NVIC_ClearPendingIRQ(UART0_RX_TX_IRQn);
+	NVIC_SetPriority(UART0_RX_TX_IRQn,3);
+	UART0->C2 |= UART_C2_RIE_MASK;
+	*/
+	//przydatne odpalanie diody
+	SIM->SCGC5 |= SIM_SCGC5_PORTB_MASK;
+	PTB->PDDR |= 1<<22 | 1<<21;
+	LED2_EN;
+	LED3_EN;
+	LED2_ON;
+	LED3_ON;
+	
+	/*OSA_TaskCreate(	TaskWait4uart, // Task function.
+									"Wait4Uart", // Task name.
+									10, // Stack size.
+									Wait4Uart_stack, // Stack address. task_stack_t *
+									5, // Task priority.
+									(task_param_t)0, // Parameter.
+									false, // Use float register or not.
+									&TaskWait4Uart_handler); // Task handler.
+									
+		*/							
+	//OSA_Start();
 
 
 	
@@ -562,11 +668,22 @@ int main(void)
 #endif
   while(1)
   {
+		
+		
 #if !ENET_RECEIVE_ALL_INTERRUPT
     ENET_receive(enetIfPtr);
 #endif
+		
+		if( (UART0->S1 & UART_S1_RDRF_MASK) == UART_S1_RDRF_MASK){
+			ReadUARTdata();
+			//tx_flag=1;
+		//tcp_write(tpcb, XX, 2, 1);	
+	}
     sys_check_timeouts();
 
   }
   
 }
+
+
+
