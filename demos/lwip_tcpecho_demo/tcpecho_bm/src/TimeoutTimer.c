@@ -27,7 +27,7 @@ void TO_Timer_stop(void){
 void TO_Timer_callbackIRQ(void){
 	
 	//jezeli bufor in nie jest pusty to odpalic dma
-	if(HalfBuffTx.write_size>0){
+	/*if(HalfBuffTx.write_size>0){
 		if (HalfBuffTx.AorB == 'A'){
 				HalfBuffTx.write_ptr = &buffB[0];
 				HalfBuffTx.read_ptr = &buffA[0];
@@ -46,6 +46,9 @@ void TO_Timer_callbackIRQ(void){
 			
 			tx_flag=1;
 		}
+		*/
+	if( CircBuffTx.size >0 )
+		timeout_flag = 1;
 	else
 		TO_Timer_stop();
 		

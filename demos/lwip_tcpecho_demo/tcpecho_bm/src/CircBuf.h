@@ -8,6 +8,7 @@
 
 
 #define TX_BUFFER_SIZE 10
+#define CIRC_BUFF_SIZE 100
 #define TX_TIMEOUT 10 //timeout incoming data in ms 
 #define ABSIZE 10 //A and B buffer size
 
@@ -27,14 +28,34 @@ typedef struct {
 	uint8_t AorB;
 } HBuffer;
 
+
+typedef struct {
+	uint8_t *buff_start;
+	uint8_t *read_ptr;
+	uint16_t buff_cap;
+	uint16_t size;
+	uint16_t windex;
+} CBuffer;
+	
+
+
 extern HBuffer HalfBuffTx;
 extern HBuffer HalfBuffRx;
+
+extern CBuffer CircBuffTx;
+extern uint8_t CTxBuff[CIRC_BUFF_SIZE];
 
 
 void DMA_startTX(void);
 
 void ReadUARTdata(void);
 void HalfBuffInit(void);
+
+
+void DMA_startTX2(uint8_t *src, uint8_t *dst, uint16_t size);
+void CircBuffInit(void);
+bool CircBuffRead(CBuffer *bptr, uint8_t *dst_buff,uint16_t len );
+bool CircBuffWrite(CBuffer *bptr, uint8_t *data );
 
 
 

@@ -83,10 +83,13 @@ HBuffer HalfBuffTx;
 HBuffer HalfBuffRx;
 uint8_t tx_buffer[TX_BUFFER_SIZE];
 
+uint8_t CTxBuff[CIRC_BUFF_SIZE];
+
 static struct tcp_pcb *echo_pcb;
 
 char XX[3] = "012";
 volatile uint8_t tx_flag=0;
+volatile uint8_t timeout_flag=0;
 enum echo_states
 {
   ES_NONE = 0,
@@ -545,7 +548,7 @@ void ReadInPoll(struct tcp_pcb *tpcb){
 	{
 		tcp_write(tpcb, XX, 2, 1);
 
-		tcp_write(tpcb,tx_buffer,HalfBuffTx.read_size,1);
+		tcp_write(tpcb,tx_buffer,TX_BUFFER_SIZE,1);
 		tx_flag = 0;
 	}
 		
@@ -679,6 +682,11 @@ int main(void)
 			//tx_flag=1;
 		//tcp_write(tpcb, XX, 2, 1);	
 	}
+		
+	
+	if(CircBuffRead(CircBuffTx, tx_buffer, TX_BUFFER_SIZE )== true)
+		tx_flag=1;
+	
     sys_check_timeouts();
 
   }

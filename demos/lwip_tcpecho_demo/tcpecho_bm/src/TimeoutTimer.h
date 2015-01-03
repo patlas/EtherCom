@@ -10,6 +10,7 @@
 
 #include "lwip/tcp.h"
 extern volatile uint8_t tx_flag;
+extern volatile uint8_t timeout_flag;
 
 
 
