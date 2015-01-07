@@ -84,12 +84,16 @@ HBuffer HalfBuffRx;
 uint8_t tx_buffer[TX_BUFFER_SIZE];
 
 uint8_t CTxBuff[CIRC_BUFF_SIZE];
+CBuffer CircBuffTx;
 
 static struct tcp_pcb *echo_pcb;
 
 char XX[3] = "012";
 volatile uint8_t tx_flag=0;
 volatile uint8_t timeout_flag=0;
+bool tx_buff_ready_flag = true;
+uint16_t tx_reduced_size = TX_BUFFER_SIZE;
+
 enum echo_states
 {
   ES_NONE = 0,
@@ -543,15 +547,15 @@ void ReadInPoll(struct tcp_pcb *tpcb){
 		tcp_write(tpcb, XX, 2, 1);
 			
 	}*/
-	
 	if(tx_flag==1)
 	{
-		tcp_write(tpcb, XX, 2, 1);
-
-		tcp_write(tpcb,tx_buffer,TX_BUFFER_SIZE,1);
+		tcp_write(tpcb, XX, 2, 1); // do usuniecia -> "01" jako znacznik nowej paczki
+		
+		tcp_write(tpcb,&tx_buffer[0],tx_reduced_size,1);
+		tx_reduced_size = TX_BUFFER_SIZE;
 		tx_flag = 0;
 	}
-		
+	tx_buff_ready_flag = true;
 	
 	
 }
@@ -624,7 +628,7 @@ int main(void)
   netif_set_default(&fsl_netif0);
   netif_set_up(&fsl_netif0);
 	
-	HalfBuffInit();
+	CircBuffInit();
   echo_init();
 
 	
@@ -684,7 +688,7 @@ int main(void)
 	}
 		
 	
-	if(CircBuffRead(CircBuffTx, tx_buffer, TX_BUFFER_SIZE )== true)
+	if(CircBuffRead(&CircBuffTx, &tx_buffer[0], TX_BUFFER_SIZE )== true)
 		tx_flag=1;
 	
     sys_check_timeouts();

@@ -58,7 +58,7 @@ void ReadUARTdata(void){
 		tx_flag = 1; //tymczasowo, zalatwi to dma
 	}*/
 	
-	CircBuffWrite(CircBuffTx, &UART_READ_DATA_REG );
+	CircBuffWrite(&CircBuffTx, &UART_READ_DATA_REG );
 
 }
 
@@ -66,11 +66,11 @@ void ReadUARTdata(void){
 
 void CircBuffInit(void){
 	
-	CircBuffTx->buff_start = &CTxBuff[0];
-	CircBuffTx->read_ptr = &CTxBuff[0];
-	CircBuffTx->buff_cap = CIRC_BUFF_SIZE;
-	CircBuffTx->size = 0;
-	CircBuffTx->windex = 0;
+	CircBuffTx.buff_start = &CTxBuff[0];
+	CircBuffTx.read_ptr = &CTxBuff[0];
+	CircBuffTx.buff_cap = CIRC_BUFF_SIZE;
+	CircBuffTx.size = 0;
+	CircBuffTx.windex = 0;
 	
 }
 
@@ -80,33 +80,43 @@ void CircBuffInit(void){
 // ta funkcja cały czas niech leci w while
 bool CircBuffRead(CBuffer *bptr, uint8_t *dst_buff, uint16_t len ){ //len to stala wartosc np 10
 		// DOPISAC FLAGE ZE GDYBY DANE JESZCZE NIE WYSZLY Z TCP TO NIE NADPISAC DST BUFF CZYLI ROBIC TUTAJ RETURN
-	if( bptr->size >0  && timeout_flag==1 ){
-		
-		if(  bptr->size < len){
-			DMA_startTX2(bptr->read_ptr, dst_buff,  bptr->size);
-			bptr->windex += (len - bptr->size);
-			bptr->size = 0;
-			bptr->read_ptr += len;
+	
+	if(tx_buff_ready_flag == true){
+		tx_buff_ready_flag = false;
+		if( bptr->size >0  && timeout_flag==1 ){
+			
+			if(  bptr->size < len){
+				DMA_startTX2(bptr->read_ptr, dst_buff,  bptr->size);
+				bptr->windex += (len - bptr->size);
+				tx_reduced_size = bptr->size;
+				bptr->size = 0;
+				bptr->read_ptr += len;
+			}
+			else{
+				DMA_startTX2(bptr->read_ptr, dst_buff,  len);
+				//bptr->windex += len;
+				bptr->size -= len;
+				bptr->read_ptr += len;
+			}
+			
+			if(bptr->read_ptr >= (bptr->buff_start + bptr->buff_cap) ) bptr->read_ptr = bptr->buff_start;
+			timeout_flag=0;
 			return true;
 		}
-		else{
+		else if( bptr->size >=len ){
 			DMA_startTX2(bptr->read_ptr, dst_buff,  len);
-			bptr->windex += len;
+			//bptr->windex += len; // to raczej tylko powoduje chaotyczne gromadzenei danych
 			bptr->size -= len;
 			bptr->read_ptr += len;
+			if(bptr->read_ptr >= (bptr->buff_start + bptr->buff_cap) ) bptr->read_ptr = bptr->buff_start;
 			return true;
+			
 		}
+		else 
+			return false;
 	}
-	else if( bptr->size >=len ){
-		DMA_startTX2(bptr->read_ptr, dst_buff,  len);
-		bptr->windex += len;
-		bptr->size -= len;
-		bptr->read_ptr += len;
-		
-	}
-	else 
+	else
 		return false;
-
 }
 
 
@@ -116,7 +126,7 @@ bool CircBuffWrite(CBuffer *bptr, uint8_t *data){ //mozna tylko 1bajt zapisac
 	if( asize>0 ){
 			//zrobic zapis
 			
-			if( bptr->windex == bptr->buff_cap)
+			if( bptr->windex == (bptr->buff_cap /*-1*/) )
 				bptr->windex = 0;
 			
 			bptr->buff_start[bptr->windex] = *data;

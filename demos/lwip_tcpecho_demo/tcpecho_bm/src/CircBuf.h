@@ -44,6 +44,8 @@ extern HBuffer HalfBuffRx;
 
 extern CBuffer CircBuffTx;
 extern uint8_t CTxBuff[CIRC_BUFF_SIZE];
+extern bool tx_buff_ready_flag;
+extern uint16_t tx_reduced_size;
 
 
 void DMA_startTX(void);
