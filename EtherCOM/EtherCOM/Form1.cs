@@ -10,13 +10,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO.Ports;
+using System.Threading;
 
 namespace EtherCOM
 {
     public partial class EtherCOM : Form
     {
         public Form_Data Data;
-        static public SerialPort serial_port;
+        public SerialPort serial_port;
         public EtherCOM()
         {
             InitializeComponent();
@@ -41,52 +42,22 @@ namespace EtherCOM
             Baudrate.Text = "115200";
             Databits.Text = "8";
             Parity.SelectedIndex = 0;
-            Handshake.SelectedIndex = 0;
-            Mode.SelectedIndex = 0;
+        }
+
+        private void EtherCOM_Connect(object sender, EventArgs e)
+        {
             {
                 string portName = COM.Text;
                 int baudRate = Convert.ToInt32(Baudrate.Text);
-                Parity parity = (System.IO.Ports.Parity)Parity.SelectedValue;
+                Parity parity = System.IO.Ports.Parity.None;
                 int dataBits = Convert.ToInt32(Databits.Text);
                 StopBits stopBits = StopBits.One;
                 serial_port = new SerialPort(portName, baudRate, parity, dataBits, stopBits);
                 Data.SerialPort_Init(serial_port);
             }
-        }
-
-        private void EtherCOM_Connect(object sender, EventArgs e)
-        {
             if (Module_IP.Text.Length > 0 && Port.Text.Length > 0)
             {
-                TcpClient client = new TcpClient();
-
-                IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(Module_IP.Text), Convert.ToInt32(Port.Text));
-
-                client.Connect(serverEndPoint);
-
-                NetworkStream clientStream = client.GetStream();
-
-                ASCIIEncoding encoder = new ASCIIEncoding();
-                String rs232_parameters = COM.Text + "," + Baudrate.Text + "," +
-                                          Databits.Text + "," + Parity.Text + "," +
-                                          Handshake.Text + "," + Mode.Text;
-                rs232_parameters = COM.Text;
-                byte[] buffer_write = encoder.GetBytes(rs232_parameters);
-                for (int i = 0; i < buffer_write.Length; i++)
-                {
-                    byte[] buffer_write_8byte = new byte[8];
-                    buffer_write_8byte[i % 8] = buffer_write[i];
-                    if (i % 8 == 0 || i == buffer_write.Length - 1)
-                        clientStream.Write(buffer_write_8byte, 0, buffer_write_8byte.Length);
-                }          
-                clientStream.Flush();
-                byte[] buffer_read = new byte[255];
-                clientStream.Read(buffer_read, 0, buffer_read.Length);
-                Decoder decoder = encoder.GetDecoder();
-                char[] text = new char[255];
-                decoder.GetChars(buffer_read, 0, buffer_read.Length, text, 0, true);
-                for (int i = 0; i < 255; i++)
-                    Data.DataReceived.Text += text[i];
+                Data.TCP_Init(Module_IP.Text, Port.Text);
             }
         }
     }

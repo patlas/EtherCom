@@ -34,11 +34,7 @@
             this.Databits = new System.Windows.Forms.TextBox();
             this.COM_label = new System.Windows.Forms.Label();
             this.Parity_label = new System.Windows.Forms.Label();
-            this.Handshake_label = new System.Windows.Forms.Label();
-            this.Mode_label = new System.Windows.Forms.Label();
             this.Parity = new System.Windows.Forms.ComboBox();
-            this.Handshake = new System.Windows.Forms.ComboBox();
-            this.Mode = new System.Windows.Forms.ComboBox();
             this.Module_IP_label = new System.Windows.Forms.Label();
             this.Module_IP = new System.Windows.Forms.TextBox();
             this.Port_label = new System.Windows.Forms.Label();
@@ -97,24 +93,6 @@
             this.Parity_label.TabIndex = 7;
             this.Parity_label.Text = "Parity";
             // 
-            // Handshake_label
-            // 
-            this.Handshake_label.AutoSize = true;
-            this.Handshake_label.Location = new System.Drawing.Point(12, 165);
-            this.Handshake_label.Name = "Handshake_label";
-            this.Handshake_label.Size = new System.Drawing.Size(62, 13);
-            this.Handshake_label.TabIndex = 9;
-            this.Handshake_label.Text = "Handshake";
-            // 
-            // Mode_label
-            // 
-            this.Mode_label.AutoSize = true;
-            this.Mode_label.Location = new System.Drawing.Point(12, 204);
-            this.Mode_label.Name = "Mode_label";
-            this.Mode_label.Size = new System.Drawing.Size(34, 13);
-            this.Mode_label.TabIndex = 11;
-            this.Mode_label.Text = "Mode";
-            // 
             // Parity
             // 
             this.Parity.FormattingEnabled = true;
@@ -127,31 +105,6 @@
             this.Parity.Name = "Parity";
             this.Parity.Size = new System.Drawing.Size(121, 21);
             this.Parity.TabIndex = 12;
-            // 
-            // Handshake
-            // 
-            this.Handshake.FormattingEnabled = true;
-            this.Handshake.Items.AddRange(new object[] {
-            "OFF",
-            "RTS/CTS",
-            "Xon/Xoff"});
-            this.Handshake.Location = new System.Drawing.Point(15, 181);
-            this.Handshake.Name = "Handshake";
-            this.Handshake.Size = new System.Drawing.Size(121, 21);
-            this.Handshake.TabIndex = 13;
-            // 
-            // Mode
-            // 
-            this.Mode.FormattingEnabled = true;
-            this.Mode.Items.AddRange(new object[] {
-            "Free",
-            "PortStore test",
-            "Data",
-            "Setup"});
-            this.Mode.Location = new System.Drawing.Point(15, 220);
-            this.Mode.Name = "Mode";
-            this.Mode.Size = new System.Drawing.Size(121, 21);
-            this.Mode.TabIndex = 14;
             // 
             // Module_IP_label
             // 
@@ -207,18 +160,14 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(329, 262);
+            this.ClientSize = new System.Drawing.Size(329, 174);
             this.Controls.Add(this.COM);
             this.Controls.Add(this.Connect_button);
             this.Controls.Add(this.Port_label);
             this.Controls.Add(this.Port);
             this.Controls.Add(this.Module_IP_label);
             this.Controls.Add(this.Module_IP);
-            this.Controls.Add(this.Mode);
-            this.Controls.Add(this.Handshake);
             this.Controls.Add(this.Parity);
-            this.Controls.Add(this.Mode_label);
-            this.Controls.Add(this.Handshake_label);
             this.Controls.Add(this.Parity_label);
             this.Controls.Add(this.COM_label);
             this.Controls.Add(this.Databits_label);
@@ -241,11 +190,7 @@
         private System.Windows.Forms.TextBox Databits;
         private System.Windows.Forms.Label COM_label;
         private System.Windows.Forms.Label Parity_label;
-        private System.Windows.Forms.Label Handshake_label;
-        private System.Windows.Forms.Label Mode_label;
         private System.Windows.Forms.ComboBox Parity;
-        private System.Windows.Forms.ComboBox Handshake;
-        private System.Windows.Forms.ComboBox Mode;
         private System.Windows.Forms.Label Module_IP_label;
         private System.Windows.Forms.TextBox Module_IP;
         private System.Windows.Forms.Label Port_label;
