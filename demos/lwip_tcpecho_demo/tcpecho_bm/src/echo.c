@@ -82,9 +82,13 @@ uint8_t buffB[ABSIZE];
 HBuffer HalfBuffTx;
 HBuffer HalfBuffRx;
 uint8_t tx_buffer[TX_BUFFER_SIZE];
+uint8_t tx_uart[UART_BUFFER_SIZE];
 
 uint8_t CTxBuff[CIRC_BUFF_SIZE];
+uint8_t CRxBuff[CIRC_BUFF_SIZE];
 CBuffer CircBuffTx;
+CBuffer CircBuffRx;
+
 
 static struct tcp_pcb *echo_pcb;
 
@@ -93,7 +97,7 @@ volatile uint8_t tx_flag=0;
 volatile uint8_t timeout_flag=0;
 bool tx_buff_ready_flag = true;
 uint16_t tx_reduced_size = TX_BUFFER_SIZE;
-
+uint16_t uart_reduced_size = TX_BUFFER_SIZE;
 enum echo_states
 {
   ES_NONE = 0,
@@ -236,7 +240,7 @@ echo_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
     /* install send completion notifier */
     //tcp_sent(tpcb, TCP_UART_sent);
     //echo_send(tpcb, es);
-		//tcp_write(tpcb, &XX[1], 2, 1);
+		//tcp_write(tpcb, &XX[1], 2, 1); !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		UART_DRV_SendData ( BOARD_DEBUG_UART_INSTANCE, es->p->payload,es->p->len);
 		//tutaj tylko odebrac dane do konfiguracji interface'u i nie robic nic wiecej -> powyzsze usunac
     ret_err = ERR_OK;
@@ -421,6 +425,9 @@ echo_send(struct tcp_pcb *tpcb, struct echo_state *es)
 
 void TCP_UART_send(struct tcp_pcb *tpcb, struct echo_state *es)
 {
+	int i;
+	uint8_t dat[8];
+	
   struct pbuf *ptr;
   err_t wr_err = ERR_OK;
  
@@ -433,7 +440,14 @@ void TCP_UART_send(struct tcp_pcb *tpcb, struct echo_state *es)
   /* enqueue data for transmission */
   //wr_err = tcp_write(tpcb, ptr->payload, ptr->len, 1);
 	//UART_DRV_SendData ( BOARD_DEBUG_UART_INSTANCE, es->p->payload,es->p->len);
-	UART_DRV_SendDataBlocking(BOARD_DEBUG_UART_INSTANCE, es->p->payload, es->p->len, 200);
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//UART_DRV_SendDataBlocking(BOARD_DEBUG_UART_INSTANCE, es->p->payload, es->p->len, 200);
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		memcpy(dat,es->p->payload,es->p->len);
+		for(i=0;i<es->p->len; i++){
+			CircBuffWrite(&CircBuffRx, &dat[i]);
+		}
+		wr_err = ERR_OK;
   if (wr_err == ERR_OK)
   {
      u16_t plen;
@@ -502,7 +516,7 @@ TCP_UART_sent(void *arg, struct tcp_pcb *tpcb, u16_t len)
 void
 echo_close(struct tcp_pcb *tpcb, struct echo_state *es)
 {
-  /*tcp_arg(tpcb, NULL);
+  tcp_arg(tpcb, NULL);
   tcp_sent(tpcb, NULL);
   tcp_recv(tpcb, NULL);
   tcp_err(tpcb, NULL);
@@ -512,7 +526,7 @@ echo_close(struct tcp_pcb *tpcb, struct echo_state *es)
   {
     mem_free(es);
   }  
-  tcp_close(tpcb);*/
+  tcp_close(tpcb);
 }
 
 #endif /* LWIP_TCP */
@@ -691,9 +705,14 @@ int main(void)
 	if(CircBuffRead(&CircBuffTx, &tx_buffer[0], TX_BUFFER_SIZE )== true)
 		tx_flag=1;
 	
+	else if(CircBuffRead4Uart(&CircBuffRx, &tx_uart[0], UART_BUFFER_SIZE ) == true){
+		UART_DRV_SendDataBlocking(BOARD_DEBUG_UART_INSTANCE, &tx_uart[0], uart_reduced_size, 200); // przeanalizowac argumenty
+	}
+	
     sys_check_timeouts();
 
   }
+	
   
 }
 
