@@ -72,6 +72,12 @@ void CircBuffInit(void){
 	CircBuffTx.size = 0;
 	CircBuffTx.windex = 0;
 	
+	CircBuffRx.buff_start = &CRxBuff[0];
+	CircBuffRx.read_ptr = &CRxBuff[0];
+	CircBuffRx.buff_cap = CIRC_BUFF_SIZE;
+	CircBuffRx.size = 0;
+	CircBuffRx.windex = 0;
+	
 }
 
 
@@ -138,4 +144,43 @@ bool CircBuffWrite(CBuffer *bptr, uint8_t *data){ //mozna tylko 1bajt zapisac
 	}
 	else
 		return false;
+}
+
+
+
+bool CircBuffRead4Uart(CBuffer *bptr, uint8_t *dst_buff, uint16_t len ){ //len to stala wartosc np 10
+
+
+		if( bptr->size >0  && timeout_flag==1 ){
+			
+			if(  bptr->size < len){
+				DMA_startTX2(bptr->read_ptr, dst_buff,  bptr->size);
+				bptr->windex += (len - bptr->size);
+				uart_reduced_size = bptr->size;
+				bptr->size = 0;
+				bptr->read_ptr += len;
+			}
+			else{
+				DMA_startTX2(bptr->read_ptr, dst_buff,  len);
+				//bptr->windex += len;
+				bptr->size -= len;
+				bptr->read_ptr += len;
+			}
+			
+			if(bptr->read_ptr >= (bptr->buff_start + bptr->buff_cap) ) bptr->read_ptr = bptr->buff_start;
+			timeout_flag=0;
+			return true;
+		}
+		else if( bptr->size >=len ){
+			DMA_startTX2(bptr->read_ptr, dst_buff,  len);
+			//bptr->windex += len; // to raczej tylko powoduje chaotyczne gromadzenei danych
+			bptr->size -= len;
+			bptr->read_ptr += len;
+			if(bptr->read_ptr >= (bptr->buff_start + bptr->buff_cap) ) bptr->read_ptr = bptr->buff_start;
+			return true;
+			
+		}
+		else 
+			return false;
+
 }

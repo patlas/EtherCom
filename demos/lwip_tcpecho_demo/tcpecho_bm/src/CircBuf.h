@@ -8,6 +8,7 @@
 
 
 #define TX_BUFFER_SIZE 10
+#define UART_BUFFER_SIZE 8
 #define CIRC_BUFF_SIZE 100
 #define TX_TIMEOUT 10 //timeout incoming data in ms 
 #define ABSIZE 10 //A and B buffer size
@@ -43,10 +44,13 @@ extern HBuffer HalfBuffTx;
 extern HBuffer HalfBuffRx;
 
 extern CBuffer CircBuffTx;
+extern CBuffer CircBuffRx;
 extern uint8_t CTxBuff[CIRC_BUFF_SIZE];
+extern uint8_t CRxBuff[CIRC_BUFF_SIZE];
+
 extern bool tx_buff_ready_flag;
 extern uint16_t tx_reduced_size;
-
+extern uint16_t uart_reduced_size;
 
 void DMA_startTX(void);
 
@@ -58,6 +62,7 @@ void DMA_startTX2(uint8_t *src, uint8_t *dst, uint16_t size);
 void CircBuffInit(void);
 bool CircBuffRead(CBuffer *bptr, uint8_t *dst_buff,uint16_t len );
 bool CircBuffWrite(CBuffer *bptr, uint8_t *data );
+bool CircBuffRead4Uart(CBuffer *bptr, uint8_t *dst_buff, uint16_t len );
 
 
 
