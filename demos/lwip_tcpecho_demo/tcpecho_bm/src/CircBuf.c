@@ -151,7 +151,7 @@ bool CircBuffWrite(CBuffer *bptr, uint8_t *data){ //mozna tylko 1bajt zapisac
 bool CircBuffRead4Uart(CBuffer *bptr, uint8_t *dst_buff, uint16_t len ){ //len to stala wartosc np 10
 
 
-		if( bptr->size >0  && timeout_flag==1 ){
+		if( bptr->size >0  && timeout_flag==3 /*timeout flag zrobic wlasne albo wyeliminowac*/ ){
 			
 			if(  bptr->size < len){
 				DMA_startTX2(bptr->read_ptr, dst_buff,  bptr->size);
