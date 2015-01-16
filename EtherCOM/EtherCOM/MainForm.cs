@@ -16,29 +16,22 @@ namespace EtherCOM
 {
     public partial class EtherCOM : Form
     {
-        public Form_Data Data;
-        public SerialPort serial_port;
         public EtherCOM()
         {
             InitializeComponent();
         }
 
         private void EtherCOM_OnLoad(object sender, EventArgs e)
-        {       
-            Data = new Form_Data();
-            Data.Show();
-            Data.Location = new Point(this.Location.X + this.Size.Width, this.Location.Y);
+        {               
             // Initializace COM Ports
             string[] ports = SerialPort.GetPortNames();
             foreach (string port in ports)
-            {
-                COM.Items.Add(port);
-            }
+                Com.Items.Add(port);
             //Default parameters
-            Module_IP.Text = "192.168.2.102";
+            ModuleIP.Text = "192.168.2.102";
             Port.Text = "7";
 
-            COM.Text = "COM8";
+            Com.Text = "COM8";
             Baudrate.Text = "115200";
             Databits.Text = "8";
             Parity.SelectedIndex = 0;
@@ -46,18 +39,31 @@ namespace EtherCOM
 
         private void EtherCOM_Connect(object sender, EventArgs e)
         {
+            if (ModuleIP.Text.Length > 0 && Port.Text.Length > 0)
             {
-                string portName = COM.Text;
+                string portName = Com.Text;
                 int baudRate = Convert.ToInt32(Baudrate.Text);
                 Parity parity = System.IO.Ports.Parity.None;
                 int dataBits = Convert.ToInt32(Databits.Text);
                 StopBits stopBits = StopBits.One;
-                serial_port = new SerialPort(portName, baudRate, parity, dataBits, stopBits);
-                Data.SerialPort_Init(serial_port);
+                SerialPort serial_port = new SerialPort(portName, baudRate, parity, dataBits, stopBits);
+
+                RsForm RsFormInstance = new RsForm();
+                RsFormInstance.Show();
+                RsFormInstance.Location = new Point(this.Location.X + this.Width, this.Location.Y);
+                RsFormInstance.Init(serial_port);
+
+                TcpForm TcpFormInstance = new TcpForm();
+                TcpFormInstance.Show();
+                TcpFormInstance.Location = new Point(this.Location.X + this.Width + RsFormInstance.Width, this.Location.Y);
+                TcpFormInstance.Init(ModuleIP.Text, Port.Text);
             }
-            if (Module_IP.Text.Length > 0 && Port.Text.Length > 0)
+            else
             {
-                Data.TCP_Init(Module_IP.Text, Port.Text);
+                if( ModuleIP.Text.Length > 0 )
+                    ModuleIP.Text = "Enter IP";
+                if( Port.Text.Length > 0 )
+                    Port.Text = "Enter PORT";
             }
         }
     }

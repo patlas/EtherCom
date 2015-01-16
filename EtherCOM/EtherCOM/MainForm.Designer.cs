@@ -36,11 +36,11 @@
             this.Parity_label = new System.Windows.Forms.Label();
             this.Parity = new System.Windows.Forms.ComboBox();
             this.Module_IP_label = new System.Windows.Forms.Label();
-            this.Module_IP = new System.Windows.Forms.TextBox();
+            this.ModuleIP = new System.Windows.Forms.TextBox();
             this.Port_label = new System.Windows.Forms.Label();
             this.Port = new System.Windows.Forms.TextBox();
-            this.Connect_button = new System.Windows.Forms.Button();
-            this.COM = new System.Windows.Forms.ComboBox();
+            this.ConnectButton = new System.Windows.Forms.Button();
+            this.Com = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // Baudrate
@@ -115,12 +115,12 @@
             this.Module_IP_label.TabIndex = 16;
             this.Module_IP_label.Text = "Module IP";
             // 
-            // Module_IP
+            // ModuleIP
             // 
-            this.Module_IP.Location = new System.Drawing.Point(197, 25);
-            this.Module_IP.Name = "Module_IP";
-            this.Module_IP.Size = new System.Drawing.Size(100, 20);
-            this.Module_IP.TabIndex = 15;
+            this.ModuleIP.Location = new System.Drawing.Point(197, 25);
+            this.ModuleIP.Name = "ModuleIP";
+            this.ModuleIP.Size = new System.Drawing.Size(100, 20);
+            this.ModuleIP.TabIndex = 15;
             // 
             // Port_label
             // 
@@ -138,35 +138,35 @@
             this.Port.Size = new System.Drawing.Size(100, 20);
             this.Port.TabIndex = 17;
             // 
-            // Connect_button
+            // ConnectButton
             // 
-            this.Connect_button.Location = new System.Drawing.Point(197, 91);
-            this.Connect_button.Name = "Connect_button";
-            this.Connect_button.Size = new System.Drawing.Size(75, 23);
-            this.Connect_button.TabIndex = 19;
-            this.Connect_button.Text = "Connect";
-            this.Connect_button.UseVisualStyleBackColor = true;
-            this.Connect_button.Click += new System.EventHandler(this.EtherCOM_Connect);
+            this.ConnectButton.Location = new System.Drawing.Point(197, 91);
+            this.ConnectButton.Name = "ConnectButton";
+            this.ConnectButton.Size = new System.Drawing.Size(75, 23);
+            this.ConnectButton.TabIndex = 19;
+            this.ConnectButton.Text = "Connect";
+            this.ConnectButton.UseVisualStyleBackColor = true;
+            this.ConnectButton.Click += new System.EventHandler(this.EtherCOM_Connect);
             // 
-            // COM
+            // Com
             // 
-            this.COM.FormattingEnabled = true;
-            this.COM.Location = new System.Drawing.Point(15, 25);
-            this.COM.Name = "COM";
-            this.COM.Size = new System.Drawing.Size(121, 21);
-            this.COM.TabIndex = 20;
+            this.Com.FormattingEnabled = true;
+            this.Com.Location = new System.Drawing.Point(15, 25);
+            this.Com.Name = "Com";
+            this.Com.Size = new System.Drawing.Size(121, 21);
+            this.Com.TabIndex = 20;
             // 
             // EtherCOM
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(329, 174);
-            this.Controls.Add(this.COM);
-            this.Controls.Add(this.Connect_button);
+            this.Controls.Add(this.Com);
+            this.Controls.Add(this.ConnectButton);
             this.Controls.Add(this.Port_label);
             this.Controls.Add(this.Port);
             this.Controls.Add(this.Module_IP_label);
-            this.Controls.Add(this.Module_IP);
+            this.Controls.Add(this.ModuleIP);
             this.Controls.Add(this.Parity);
             this.Controls.Add(this.Parity_label);
             this.Controls.Add(this.COM_label);
@@ -192,11 +192,11 @@
         private System.Windows.Forms.Label Parity_label;
         private System.Windows.Forms.ComboBox Parity;
         private System.Windows.Forms.Label Module_IP_label;
-        private System.Windows.Forms.TextBox Module_IP;
+        private System.Windows.Forms.TextBox ModuleIP;
         private System.Windows.Forms.Label Port_label;
         private System.Windows.Forms.TextBox Port;
-        private System.Windows.Forms.Button Connect_button;
-        private System.Windows.Forms.ComboBox COM;
+        private System.Windows.Forms.Button ConnectButton;
+        private System.Windows.Forms.ComboBox Com;
     }
 }
 
