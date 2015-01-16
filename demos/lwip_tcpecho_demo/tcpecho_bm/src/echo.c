@@ -217,7 +217,7 @@ echo_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
       //tcp_sent(tpcb, echo_sent);
       //echo_send(tpcb, es);
 			
-			tcp_write(tpcb, &XX[0], 1, 1);
+			//tcp_write(tpcb, &XX[0], 1, 1);
     }
     ret_err = ERR_OK;
   }
@@ -253,6 +253,7 @@ echo_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
       es->p = p;
       tcp_sent(tpcb, TCP_UART_sent);
       //echo_send(tpcb, es);
+			UART_DRV_SendData(BOARD_DEBUG_UART_INSTANCE, es->p->payload,es->p->len);
 			TCP_UART_send(tpcb, es);
     }
     else
@@ -315,7 +316,6 @@ echo_poll(void *arg, struct tcp_pcb *tpcb)
 	}*/
 	
 	ReadInPoll(tpcb);
-	
 	
   es = (struct echo_state *)arg;
   if (es != NULL)
@@ -563,7 +563,7 @@ void ReadInPoll(struct tcp_pcb *tpcb){
 	}*/
 	if(tx_flag==1)
 	{
-		tcp_write(tpcb, XX, 2, 1); // do usuniecia -> "01" jako znacznik nowej paczki
+		//tcp_write(tpcb, XX, 2, 1); // do usuniecia -> "01" jako znacznik nowej paczki
 		
 		tcp_write(tpcb,&tx_buffer[0],tx_reduced_size,1);
 		tx_reduced_size = TX_BUFFER_SIZE;
@@ -610,6 +610,8 @@ int main(void)
 {
 	const unsigned char AA[] = "PAT";
 	uint8_t BB[2];
+	uart_status_t UartSendSucc = kStatus_UART_Success;
+	
   struct netif fsl_netif0;
   ip_addr_t fsl_netif0_ipaddr, fsl_netif0_netmask, fsl_netif0_gw;
   init_hardware();
@@ -705,9 +707,14 @@ int main(void)
 	if(CircBuffRead(&CircBuffTx, &tx_buffer[0], TX_BUFFER_SIZE )== true)
 		tx_flag=1;
 	
-	else if(CircBuffRead4Uart(&CircBuffRx, &tx_uart[0], UART_BUFFER_SIZE ) == true){
-		UART_DRV_SendDataBlocking(BOARD_DEBUG_UART_INSTANCE, &tx_uart[0], uart_reduced_size, 200); // przeanalizowac argumenty
-	}
+	//else if(UartSendSucc==kStatus_UART_Success){
+	//if(UART_Tx_Success == 1){
+		if(CircBuffRead4Uart(&CircBuffRx, &tx_uart[0], UART_BUFFER_SIZE ) == true){
+		//UART_DRV_SendDataBlocking(BOARD_DEBUG_UART_INSTANCE, &tx_uart[0], uart_reduced_size, 200); // przeanalizowac argumenty
+		//UartSendSucc=UART_DRV_SendData(BOARD_DEBUG_UART_INSTANCE, &tx_uart[0], uart_reduced_size); // moze wysylac caly bufor?
+			BB[0] = 1;
+		}
+	//}
 	
     sys_check_timeouts();
 
