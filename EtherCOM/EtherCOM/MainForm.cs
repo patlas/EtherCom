@@ -16,6 +16,11 @@ namespace EtherCOM
 {
     public partial class EtherCOM : Form
     {
+        private byte baudRate;
+        private byte dataBits;
+        private byte parity;
+        private byte stopBits;
+
         public EtherCOM()
         {
             InitializeComponent();
@@ -23,40 +28,25 @@ namespace EtherCOM
 
         private void EtherCOM_OnLoad(object sender, EventArgs e)
         {               
-            // Initializace COM Ports
-            string[] ports = SerialPort.GetPortNames();
-            foreach (string port in ports)
-                Com.Items.Add(port);
             //Default parameters
             ModuleIP.Text = "192.168.2.102";
             Port.Text = "7";
 
-            Com.Text = "COM8";
-            Baudrate.Text = "115200";
-            Databits.Text = "8";
+            Baudrate.SelectedIndex = 10;
+            Databits.SelectedIndex = 3;
             Parity.SelectedIndex = 0;
+            Stopbits.SelectedIndex = 0;
         }
 
         private void EtherCOM_Connect(object sender, EventArgs e)
         {
             if (ModuleIP.Text.Length > 0 && Port.Text.Length > 0)
             {
-                string portName = Com.Text;
-                int baudRate = Convert.ToInt32(Baudrate.Text);
-                Parity parity = System.IO.Ports.Parity.None;
-                int dataBits = Convert.ToInt32(Databits.Text);
-                StopBits stopBits = StopBits.One;
-                SerialPort serial_port = new SerialPort(portName, baudRate, parity, dataBits, stopBits);
-
-                RsForm RsFormInstance = new RsForm();
-                RsFormInstance.Show();
-                RsFormInstance.Location = new Point(this.Location.X + this.Width, this.Location.Y);
-                RsFormInstance.Init(serial_port);
-
+                CalculateRsParameters();
                 TcpForm TcpFormInstance = new TcpForm();
                 TcpFormInstance.Show();
-                TcpFormInstance.Location = new Point(this.Location.X + this.Width + RsFormInstance.Width, this.Location.Y);
-                TcpFormInstance.Init(ModuleIP.Text, Port.Text);
+                TcpFormInstance.Location = new Point(this.Location.X + this.Width, this.Location.Y);
+                TcpFormInstance.Init(ModuleIP.Text, Port.Text, baudRate, dataBits, parity, stopBits);
             }
             else
             {
@@ -65,6 +55,14 @@ namespace EtherCOM
                 if( Port.Text.Length > 0 )
                     Port.Text = "Enter PORT";
             }
+        }
+
+        private void CalculateRsParameters()
+        {
+            baudRate = (byte)Baudrate.SelectedIndex;
+            dataBits = (byte)Databits.SelectedIndex;
+            parity   = (byte)Parity.SelectedIndex;
+            stopBits = (byte)Stopbits.SelectedIndex;
         }
     }
 }
