@@ -22,7 +22,7 @@ namespace EtherCOM
         private string Port;
         private NetworkStream clientStream;
         private Thread oThread;
-
+        private bool Connected;
         public TcpForm()
         {
             InitializeComponent();
@@ -30,32 +30,40 @@ namespace EtherCOM
 
         public void Init(string IP_arg, string Port_arg, byte baudRate_arg, byte dataBits_arg, byte parity_arg, byte stopBits_arg)
         {
-            client = new TcpClient();
-            IP = IP_arg;
-            Port = Port_arg;
-            IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IP), Convert.ToInt32(Port));
-            client.Connect(serverEndPoint);
-            clientStream = client.GetStream();
-            byte[] RsParams = new byte[4];
-            RsParams[0] = baudRate_arg;
-            RsParams[1] = dataBits_arg;
-            RsParams[2] = parity_arg;
-            RsParams[3] = stopBits_arg;
-            SendOverIP(RsParams);
-
-            oThread = new Thread(new ThreadStart(TcpReading));
-            oThread.IsBackground = true;
-            oThread.Start();
+            try
+            {
+                client = new TcpClient();
+                IP = IP_arg;
+                Port = Port_arg;
+                IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IP), Convert.ToInt32(Port));               
+                client.Connect(serverEndPoint);
+                Connected = true;
+                clientStream = client.GetStream();
+                byte[] RsParams = new byte[4];
+                RsParams[0] = baudRate_arg;
+                RsParams[1] = dataBits_arg;
+                RsParams[2] = parity_arg;
+                RsParams[3] = stopBits_arg;
+                SendOverIP(RsParams);
+                SendType.SelectedIndex = 2;
+                oThread = new Thread(new ThreadStart(TcpReading));
+                oThread.IsBackground = true;
+                oThread.Start();
+            }
+            catch (Exception e)
+            {
+                TcpReceivedAppendText(e.Message, Color.Red);
+            }
         }
 
         private void TcpReading()
         {
-            byte[] buffer_read;        
-            while (true)
+            byte[] buffer_read;
+            while (Connected)
             {
                 try
                 {
-                    string Text = Environment.NewLine + "Reading:";
+                    string Text = "";
                     buffer_read = new byte[10];
                     clientStream.ReadTimeout = 100;
                     clientStream.Read(buffer_read, 0, buffer_read.Length);
@@ -65,10 +73,19 @@ namespace EtherCOM
                 }
                 catch (System.IO.IOException)
                 {
-                    client = new TcpClient();
-                    IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IP), Convert.ToInt32(Port));
-                    client.Connect(serverEndPoint);
-                    clientStream = client.GetStream();
+                    try
+                    {
+                        client = new TcpClient();
+                        IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IP), Convert.ToInt32(Port));
+                        client.Connect(serverEndPoint);
+                        clientStream = client.GetStream();
+                    }
+                    catch (Exception e)
+                    {
+                        TcpReceived.Invoke(new Action(delegate() { TcpReceivedAppendText(e.Message, Color.Red); }));
+                        Connected = false;
+                        break;
+                    }
                 }
             }
         }   
@@ -77,26 +94,55 @@ namespace EtherCOM
         {
             if (e.KeyCode == Keys.Enter && TcpSend.Text.Length > 0)
             {
-                TcpReceived.Text += Environment.NewLine + "Sending:" + TcpSend.Text;
+                TcpReceivedAppendText(TcpSend.Text, Color.HotPink);
                 byte[] bytes_write;
-                int NumOfPacks = TcpSend.Text.Length / 8;
-                int LastPack = TcpSend.Text.Length % 8;
-                if (NumOfPacks > 0)
+                if( SendType.SelectedIndex == 0)
                 {
-                    bytes_write = new byte[8];
-                    for (int i = 0; i < NumOfPacks; i++)
+                    bytes_write = new byte[4];
+                    try
                     {
-                        for (int j = 0; j < 8; j++)
-                            bytes_write[j] = (byte)TcpSend.Text[j + i * 8];
+                        bytes_write = BitConverter.GetBytes(Convert.ToInt32(TcpSend.Text));
                         SendOverIP(bytes_write);
                     }
+                    catch (Exception ex)
+                    {
+                        TcpReceivedAppendText(ex.Message, Color.Red);
+                    }                               
                 }
-                if (LastPack > 0)
+                else if (SendType.SelectedIndex == 1)
                 {
-                    bytes_write = new byte[LastPack];
-                    for (int j = 0; j < LastPack; j++)
-                        bytes_write[j] = (byte)TcpSend.Text[TcpSend.Text.Length - LastPack + j];
-                    SendOverIP(bytes_write);
+                    bytes_write = new byte[4];
+                    try
+                    {
+                        bytes_write = BitConverter.GetBytes(Convert.ToInt32(TcpSend.Text, 16));
+                        SendOverIP(bytes_write);
+                    }
+                    catch (Exception ex)
+                    {
+                        TcpReceivedAppendText(ex.Message, Color.Red);
+                    }   
+                }
+                else if (SendType.SelectedIndex == 2)
+                {
+                    int NumOfPacks = TcpSend.Text.Length / 8;
+                    int LastPack = TcpSend.Text.Length % 8;
+                    if (NumOfPacks > 0)
+                    {
+                        bytes_write = new byte[8];
+                        for (int i = 0; i < NumOfPacks; i++)
+                        {
+                            for (int j = 0; j < 8; j++)
+                                bytes_write[j] = (byte)TcpSend.Text[j + i * 8];
+                            SendOverIP(bytes_write);
+                        }
+                    }
+                    if (LastPack > 0)
+                    {
+                        bytes_write = new byte[LastPack];
+                        for (int j = 0; j < LastPack; j++)
+                            bytes_write[j] = (byte)TcpSend.Text[TcpSend.Text.Length - LastPack + j];
+                        SendOverIP(bytes_write);
+                    }
                 }
             }
         }
@@ -113,6 +159,26 @@ namespace EtherCOM
         private void Clean_OnClick(object sender, EventArgs e)
         {
             TcpReceived.Text = String.Empty;
+        }
+
+        private void TcpReceivedAppendText(string text, Color color)
+        {
+            TcpReceived.SelectionStart = TcpReceived.TextLength;
+            TcpReceived.SelectionLength = 0;
+
+            TcpReceived.SelectionColor = color;
+            TcpReceived.AppendText(text);
+            TcpReceived.SelectionColor = TcpReceived.ForeColor;
+        }
+
+        private void Disconnect_OnClick(object sender, EventArgs e)
+        {
+            if (client != null && client.Connected)
+            {
+                Connected = false;
+                client.Close();          
+            }
+            this.Close();
         }
     }
 }
