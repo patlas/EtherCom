@@ -32,6 +32,7 @@
             this.TcpSend = new System.Windows.Forms.TextBox();
             this.TcpReceivedLabel = new System.Windows.Forms.Label();
             this.TcpSendLabel = new System.Windows.Forms.Label();
+            this.Clean = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // TcpReceived
@@ -68,9 +69,20 @@
             this.TcpSendLabel.TabIndex = 8;
             this.TcpSendLabel.Text = "Send";
             // 
+            // Clean
+            // 
+            this.Clean.Location = new System.Drawing.Point(182, 15);
+            this.Clean.Name = "Clean";
+            this.Clean.Size = new System.Drawing.Size(75, 23);
+            this.Clean.TabIndex = 12;
+            this.Clean.Text = "Clean";
+            this.Clean.UseVisualStyleBackColor = true;
+            this.Clean.Click += new System.EventHandler(this.Clean_OnClick);
+            // 
             // TcpForm
             // 
             this.ClientSize = new System.Drawing.Size(284, 262);
+            this.Controls.Add(this.Clean);
             this.Controls.Add(this.TcpReceived);
             this.Controls.Add(this.TcpSend);
             this.Controls.Add(this.TcpReceivedLabel);
@@ -92,5 +104,6 @@
         private System.Windows.Forms.TextBox TcpSend;
         private System.Windows.Forms.Label TcpReceivedLabel;
         private System.Windows.Forms.Label TcpSendLabel;
+        private System.Windows.Forms.Button Clean;
     }
 }
