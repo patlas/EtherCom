@@ -35,7 +35,7 @@ namespace EtherCOM
                 client = new TcpClient();
                 IP = IP_arg;
                 Port = Port_arg;
-                IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IP), Convert.ToInt32(Port));               
+                IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IP), Convert.ToInt32(Port)); 
                 client.Connect(serverEndPoint);
                 Connected = true;
                 clientStream = client.GetStream();
@@ -46,9 +46,11 @@ namespace EtherCOM
                 RsParams[3] = stopBits_arg;
                 SendOverIP(RsParams);
                 SendType.SelectedIndex = 2;
+                
                 oThread = new Thread(new ThreadStart(TcpReading));
                 oThread.IsBackground = true;
                 oThread.Start();
+                
             }
             catch (Exception e)
             {
@@ -59,14 +61,18 @@ namespace EtherCOM
         private void TcpReading()
         {
             byte[] buffer_read;
+            TcpClient clientReading = new TcpClient();
+            IPEndPoint serverEndPointReading = new IPEndPoint(IPAddress.Parse(IP), Convert.ToInt32(Port));
+            clientReading.Connect(serverEndPointReading);
+            NetworkStream clientStreamReading = clientReading.GetStream();
             while (Connected)
             {
                 try
                 {
                     string Text = "";
                     buffer_read = new byte[10];
-                    clientStream.ReadTimeout = 100;
-                    clientStream.Read(buffer_read, 0, buffer_read.Length);
+                    clientStreamReading.ReadTimeout = 100;
+                    clientStreamReading.Read(buffer_read, 0, buffer_read.Length);
                     foreach (byte c in buffer_read)
                         Text += (char)c;
                     TcpReceived.Invoke(new Action(delegate() { TcpReceived.AppendText(Text); }));
@@ -75,10 +81,10 @@ namespace EtherCOM
                 {
                     try
                     {
-                        client = new TcpClient();
-                        IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IP), Convert.ToInt32(Port));
-                        client.Connect(serverEndPoint);
-                        clientStream = client.GetStream();
+                        clientReading.Close();
+                        clientReading = new TcpClient();
+                        clientReading.Connect(serverEndPointReading);
+                        clientStreamReading = clientReading.GetStream();
                     }
                     catch (Exception e)
                     {
@@ -149,11 +155,16 @@ namespace EtherCOM
 
         private void SendOverIP(byte[] bytes_write)
         {
-            client = new TcpClient();
-            IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse(IP), Convert.ToInt32(Port));
-            client.Connect(serverEndPoint);
-            clientStream = client.GetStream();
-            clientStream.Write(bytes_write, 0, bytes_write.Length);
+            try
+            {
+                clientStream.Write(bytes_write, 0, bytes_write.Length);
+            }
+            catch (Exception e)
+            {
+                client.Close();
+                TcpReceived.Invoke(new Action(delegate() { TcpReceivedAppendText(e.Message, Color.Red); }));
+                Connected = false;
+            }
         }
 
         private void Clean_OnClick(object sender, EventArgs e)

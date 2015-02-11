@@ -50,9 +50,9 @@ namespace EtherCOM
             }
             else
             {
-                if( ModuleIP.Text.Length > 0 )
+                if( ModuleIP.Text.Length == 0 )
                     ModuleIP.Text = "Enter IP";
-                if( Port.Text.Length > 0 )
+                if( Port.Text.Length == 0 )
                     Port.Text = "Enter PORT";
             }
         }
