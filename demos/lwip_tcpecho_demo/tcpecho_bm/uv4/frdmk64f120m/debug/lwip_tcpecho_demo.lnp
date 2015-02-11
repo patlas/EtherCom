@@ -62,6 +62,8 @@
 "debug\echo.o"
 "debug\fsl_enet_irq.o"
 "debug\fsl_phy_driver.o"
+"debug\circbuf.o"
+"debug\timeouttimer.o"
 "debug\gpio_pins.o"
 "debug\pin_mux.o"
 "debug\hardware_init.o"
