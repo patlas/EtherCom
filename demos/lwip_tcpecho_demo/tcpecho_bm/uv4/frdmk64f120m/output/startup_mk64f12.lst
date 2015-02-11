@@ -1117,7 +1117,8 @@ ARM Macro Assembler    Page 18
               00000000 
 Command Line: --debug --cpreproc --diag_suppress=9931,1609,1581 --cpu=Cortex-M4
 .fp --apcs=interwork --depend=debug\startup_mk64f12.d -odebug\startup_mk64f12.o
- -IC:\Keil_v5\ARM\RV31\INC -IC:\Keil_v5\ARM\CMSIS\Include -IC:\Keil_v5\ARM\Inc\
-Freescale\Kinetis --predefine="__MICROLIB SETA 1" --predefine="MK64FN1M0xxx12 S
-ETA 1" --predefine="DEBUG SETA 1" --list=.\output\startup_mk64f12.lst ../../../
-../../platform/startup/MK64F12/arm/startup_MK64F12.s
+ -IC:\Users\PatLas\Documents\GitHub\EtherComm\demos\lwip_tcpecho_demo\tcpecho_b
+m\uv4\frdmk64f120m\RTE -IC:\Keil_v5\ARM\PACK\Keil\Kinetis_K60_DFP\1.2.0\Device\
+Include -IC:\Keil_v5\ARM\CMSIS\Include --predefine="__MICROLIB SETA 1" --predef
+ine="MK64FN1M0xxx12 SETA 1" --predefine="DEBUG SETA 1" --list=.\output\startup_
+mk64f12.lst ../../../../../platform/startup/MK64F12/arm/startup_MK64F12.s

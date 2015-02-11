@@ -71,7 +71,7 @@ uart_status_t UART_DRV_Init(uint32_t instance, uart_state_t * uartStatePtr,
     /* Exit if current instance is already initialized. */
     if (g_uartStatePtr[instance])
     {
-        return kStatus_UART_Initialized;
+        //return kStatus_UART_Initialized;
     }
 
     /* Clear the state structure for this instance. */
@@ -452,8 +452,8 @@ uart_status_t UART_DRV_SendData(uint32_t instance,
                                 const uint8_t * txBuff,
                                 uint32_t txSize)
 {
-    assert(txBuff);
-    assert(instance < HW_UART_INSTANCE_COUNT);
+    //assert(txBuff);
+    //assert(instance < HW_UART_INSTANCE_COUNT);
 
     uart_state_t * uartState = (uart_state_t *)g_uartStatePtr[instance];
 

@@ -70,6 +70,7 @@
 #include "ethernetif.h"
 #include "board.h"
 #include "fsl_pit_driver.h"
+#include "fsl_uart_common.h"
 
 //#include "api.h"
 
@@ -98,6 +99,7 @@ volatile uint8_t timeout_flag=0;
 bool tx_buff_ready_flag = true;
 uint16_t tx_reduced_size = TX_BUFFER_SIZE;
 uint16_t uart_reduced_size = TX_BUFFER_SIZE;
+uint8_t uart_ready = 0;
 enum echo_states
 {
   ES_NONE = 0,
@@ -241,8 +243,129 @@ echo_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
     //tcp_sent(tpcb, TCP_UART_sent);
     //echo_send(tpcb, es);
 		//tcp_write(tpcb, &XX[1], 2, 1); !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		UART_DRV_SendData ( BOARD_DEBUG_UART_INSTANCE, es->p->payload,es->p->len);
+		uint8_t tempbuff[4];
+		//UART_DRV_SendData ( BOARD_DEBUG_UART_INSTANCE, es->p->payload,es->p->len);
+		memcpy(tempbuff,es->p->payload,es->p->len);
 		//tutaj tylko odebrac dane do konfiguracji interface'u i nie robic nic wiecej -> powyzsze usunac
+		/* UART INIT*/
+		uart_user_config_t uartConfig;
+		uart_state_t uartState;
+		uart_status_t asdf;
+
+		UART0-> C2 &= ~UART_C2_TE_MASK & ~UART_C2_RE_MASK;
+	
+		uint32_t baudRate;
+		
+		switch(tempbuff[0]){
+			case 0:
+				baudRate = 110;
+			break;
+		
+			case 1:
+				baudRate = 150;
+			break;
+			
+			case 2:
+				baudRate = 300;
+			break;
+			
+			case 3:
+				baudRate = 1200;
+			break;
+			
+			case 4:
+				baudRate = 2400;
+			break;
+			
+			case 5:
+				baudRate = 4800;
+			break;
+			
+			case 6:
+				baudRate = 9600;
+			break;
+			
+			case 7:
+				baudRate = 19200;
+			break;
+			
+			case 8:
+				baudRate = 38400;
+			break;
+			
+			case 9:
+				baudRate = 57600;
+			break;
+			
+			case 10:
+				baudRate = 115200;
+			break;
+			
+			case 11:
+				baudRate = 230400;
+			break;
+			
+			case 12:
+				baudRate = 460800;
+			break;
+			
+			case 13:
+				baudRate = 921600;
+			break;
+		};
+		
+		//baseAddr = g_uartBaseAddr[instance]; // maby that UART0_BASE  
+		uint32_t uartSourceClock = CLOCK_SYS_GetUartFreq(BOARD_DEBUG_UART_INSTANCE);
+
+		//kSystemClock ??
+		UART_HAL_SetBaudRate(g_uartBaseAddr[BOARD_DEBUG_UART_INSTANCE], uartSourceClock, baudRate);
+		
+		switch(tempbuff[1]){
+			case 3:
+				UART0->C1 &= ~UART_C1_M_MASK; //8bit data
+			break;
+			
+			case 2:
+				UART0->C1 |= UART_C1_M_MASK; // 9bits data
+			break;
+		};
+		
+		switch(tempbuff[2]){
+			case 0:
+				UART0->C1 &= ~UART_C1_PE_MASK; // parity none
+			break;
+			
+			case 2:
+				UART0->C1 |= UART_C1_PE_MASK;
+				UART0->C1 &= ~UART_C1_PT_MASK; // even parity 
+			break;
+			
+			case 1:
+				UART0->C1 |= UART_C1_PE_MASK;
+				UART0->C1 |= UART_C1_PT_MASK; // odd parity
+			break;
+		};
+		
+		switch(tempbuff[2]){
+			case 0:
+				UART0->BDH &= ~UART_BDH_SBNS_MASK;
+			break;
+			case 1:
+				UART0->BDH |= UART_BDH_SBNS_MASK; //2 stop bits, &= ~UART_SBNS => 1 stop bitCountPerChar
+			break;
+		}
+		UART0-> C2 |= UART_C2_TE_MASK | UART_C2_RE_MASK;
+		
+		
+		//uartConfig.stopBitCount = tempbuff[3];
+
+		/* Init UART device. */
+		//asdf = UART_DRV_Init(BOARD_DEBUG_UART_INSTANCE, &uartState, &uartConfig);
+		//asdf = 2;
+		uart_ready = 1;
+		/***********************************/
+		
+		
     ret_err = ERR_OK;
   }
   else if (es->state == ES_RECEIVED)
@@ -618,7 +741,7 @@ int main(void)
 	
 	/***********************************************/
 	uart_user_config_t uartConfig;
-	uartConfig.baudRate = 115200;
+	uartConfig.baudRate = 9600;//115200;
 	uartConfig.bitCountPerChar = kUart8BitsPerChar;
 	uartConfig.parityMode = kUartParityDisabled;
 	uartConfig.stopBitCount = kUartOneStopBit;
@@ -631,7 +754,7 @@ int main(void)
 	UART_DRV_Init(BOARD_DEBUG_UART_INSTANCE, &uartState, &uartConfig);
 	//UART_DRV_InstallRxCallback(BOARD_DEBUG_UART_INSTANCE, UART_rcv_callback, NULL);
 
-	UART_DRV_SendDataBlocking(BOARD_DEBUG_UART_INSTANCE, AA, 3, 200);
+	//UART_DRV_SendDataBlocking(BOARD_DEBUG_UART_INSTANCE, AA, 3, 200);
 																	
 	//UART_DRV_ReceiveData	(	BOARD_DEBUG_UART_INSTANCE,BB,1);
 /***************************************************/	
@@ -696,8 +819,8 @@ int main(void)
 #if !ENET_RECEIVE_ALL_INTERRUPT
     ENET_receive(enetIfPtr);
 #endif
-		
-		if( (UART0->S1 & UART_S1_RDRF_MASK) == UART_S1_RDRF_MASK){
+	//if(uart_ready == 1){	
+		if( (UART0->S1 & UART_S1_RDRF_MASK) == UART_S1_RDRF_MASK ){
 			ReadUARTdata();
 			//tx_flag=1;
 		//tcp_write(tpcb, XX, 2, 1);	
@@ -714,6 +837,7 @@ int main(void)
 		//UartSendSucc=UART_DRV_SendData(BOARD_DEBUG_UART_INSTANCE, &tx_uart[0], uart_reduced_size); // moze wysylac caly bufor?
 			BB[0] = 1;
 		}
+	//}
 	//}
 	
     sys_check_timeouts();

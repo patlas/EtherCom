@@ -5,10 +5,10 @@
 <h2>Tool Versions:</h2>
 IDE-Version: µVision V5.12.0.0
 Copyright (C) 2014 ARM Ltd and ARM Germany GmbH. All rights reserved.
-License Information: PatLas PatLas AGH Flex license: MDK-ARM Professional (mdk_pro) Flex Error -96
+License Information: PatLas PatLas AGH Flex license: MDK-ARM Professional: 100 user(s) (mdk_pro) Borrow: 
  
 Tool Versions:
-Toolchain:       MDK-ARM Professional  Version: 5.12.0.0
+Toolchain:       MDK-ARM Professional: 100 user(s)  Version: 5.12.0.0
 Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
 C Compiler:      Armcc.exe V5.05 (build 41)
 Assembler:       Armasm.exe V5.05 (build 41)
@@ -17,28 +17,38 @@ Library Manager: ArmAr.exe V5.05 (build 41)
 Hex Converter:   FromElf.exe V5.05 (build 41)
 CPU DLL:         SARMCM3.DLL V5.12.0.0
 Dialog DLL:      DCM.DLL V1.13.0.0
-Target DLL:      CMSIS_AGDI.dll V1.19.0.0
+    Target DLL: Segger\JL2CM3.dll
 Dialog DLL:      TCM.DLL V1.14.2.0
  
 <h2>Project:</h2>
-C:\Users\PatLas\Downloads\MQX_KSDK_1.0.0\demos\lwip_tcpecho_demo\tcpecho_bm\uv4\frdmk64f120m\lwip_tcpecho_demo.uvproj
-Project File Date:  12/15/2014
+C:\Users\PatLas\Documents\GitHub\EtherComm\demos\lwip_tcpecho_demo\tcpecho_bm\uv4\frdmk64f120m\lwip_tcpecho_demo.uvprojx
+Project File Date:  12/31/2014
 
 <h2>Output:</h2>
+Build Project 'lwip_tcpecho_demo' - Target 'lwip_tcpecho_demo Debug'
+compiling echo.c...
+C:\Users\PatLas\Documents\GitHub\EtherComm\demos\lwip_tcpecho_demo\tcpecho_bm\src\echo.c(251): warning:  #177-D: variable "uartConfig" was declared but never referenced
+                uart_user_config_t uartConfig;
+C:\Users\PatLas\Documents\GitHub\EtherComm\demos\lwip_tcpecho_demo\tcpecho_bm\src\echo.c(253): warning:  #177-D: variable "asdf" was declared but never referenced
+                uart_status_t asdf;
+C:\Users\PatLas\Documents\GitHub\EtherComm\demos\lwip_tcpecho_demo\tcpecho_bm\src\echo.c(734): warning:  #177-D: variable "AA" was declared but never referenced
+        const unsigned char AA[] = "PAT";
+C:\Users\PatLas\Documents\GitHub\EtherComm\demos\lwip_tcpecho_demo\tcpecho_bm\src\echo.c(735): warning:  #550-D: variable "BB" was set but never used
+        uint8_t BB[2];
+C:\Users\PatLas\Documents\GitHub\EtherComm\demos\lwip_tcpecho_demo\tcpecho_bm\src\echo.c(736): warning:  #177-D: variable "UartSendSucc" was declared but never referenced
+        uart_status_t UartSendSucc = kStatus_UART_Success;
+../../src/echo.c: 5 warnings, 0 errors
+linking...
+Program Size: Code=76812 RO-data=2020 RW-data=324 ZI-data=101188  
+"debug\lwip_tcpecho_demo.out" - 0 Error(s), 5 Warning(s).
+
+<h2>Collection of Component include folders:</h2>
+  C:\Users\PatLas\Documents\GitHub\EtherComm\demos\lwip_tcpecho_demo\tcpecho_bm\uv4\frdmk64f120m\RTE
+  C:\Keil_v5\ARM\PACK\Keil\Kinetis_K60_DFP\1.2.0\Device\Include
+
+<h2>Collection of Component Files used:</h2>
 Load "debug\\lwip_tcpecho_demo.out" 
-RDDI-DAP Error
-Error: Flash Download failed  -  Target DLL has been cancelled
-Load "debug\\lwip_tcpecho_demo.out" 
-RDDI-DAP Error
-Error: Flash Download failed  -  Target DLL has been cancelled
-Load "debug\\lwip_tcpecho_demo.out" 
-RDDI-DAP Error
-Error: Flash Download failed  -  Target DLL has been cancelled
-Load "debug\\lwip_tcpecho_demo.out" 
-RDDI-DAP Error
-Error: Flash Download failed  -  Target DLL has been cancelled
-Load "debug\\lwip_tcpecho_demo.out" 
-Set JLink Project File to "C:\Users\PatLas\Downloads\MQX_KSDK_1.0.0\demos\lwip_tcpecho_demo\tcpecho_bm\uv4\frdmk64f120m\JLinkSettings.ini"
+Set JLink Project File to "C:\Users\PatLas\Documents\GitHub\EtherComm\demos\lwip_tcpecho_demo\tcpecho_bm\uv4\frdmk64f120m\JLinkSettings.ini"
 * JLink Info: Device "MK64FN1M0XXX12" selected (1024 KB flash, 192 KB RAM).
  
 JLink info:
@@ -73,6 +83,3 @@ Erase Done.
 Programming Done.
 Verify OK.
 Application running ...
-</pre>
-</body>
-</html>
