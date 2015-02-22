@@ -16,6 +16,7 @@ namespace EtherCOM
 {
     public partial class EtherCOM : Form
     {
+        // Parametry połączenia
         private byte baudRate;
         private byte dataBits;
         private byte parity;
@@ -28,7 +29,7 @@ namespace EtherCOM
 
         private void EtherCOM_OnLoad(object sender, EventArgs e)
         {               
-            //Default parameters
+            // Parametry domyślne
             ModuleIP.Text = "192.168.2.102";
             Port.Text = "7";
 
@@ -43,6 +44,7 @@ namespace EtherCOM
             if (ModuleIP.Text.Length > 0 && Port.Text.Length > 0)
             {
                 CalculateRsParameters();
+                // Utworzenie i zainicjonowanie okienka zarządzającego połączeniem TCP
                 TcpForm TcpFormInstance = new TcpForm();
                 TcpFormInstance.Show();
                 TcpFormInstance.Location = new Point(this.Location.X + this.Width, this.Location.Y);
@@ -57,6 +59,7 @@ namespace EtherCOM
             }
         }
 
+        // Zrzutowanie wartości wybranych z ComboBoxów na pojedyncze bajty
         private void CalculateRsParameters()
         {
             baudRate = (byte)Baudrate.SelectedIndex;

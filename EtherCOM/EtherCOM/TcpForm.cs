@@ -17,12 +17,15 @@ namespace EtherCOM
 {
     public partial class TcpForm : Form
     {
+        // Zmienne użyte przy połączeniu TCP
         private TcpClient client;
         private string IP;
         private string Port;
         private NetworkStream clientStream;
-        private Thread oThread;
         private bool Connected;
+        // Wątek obsługujący czytanie ze strumienia TCP
+        private Thread oThread;      
+
         public TcpForm()
         {
             InitializeComponent();
@@ -32,6 +35,7 @@ namespace EtherCOM
         {
             try
             {
+                // Połączenie TCP
                 client = new TcpClient();
                 IP = IP_arg;
                 Port = Port_arg;
@@ -39,14 +43,17 @@ namespace EtherCOM
                 client.Connect(serverEndPoint);
                 Connected = true;
                 clientStream = client.GetStream();
+                // Stworzenie ramki inicjującej
                 byte[] RsParams = new byte[4];
                 RsParams[0] = baudRate_arg;
                 RsParams[1] = dataBits_arg;
                 RsParams[2] = parity_arg;
                 RsParams[3] = stopBits_arg;
+                // Przesłanie ramki
                 SendOverIP(RsParams);
+                // Ustawienie domyślne na wpisywanie tekstu
                 SendType.SelectedIndex = 2;
-                
+                // Utworzenie nowego wątku obsługującego odbieranie danych
                 oThread = new Thread(new ThreadStart(TcpReading));
                 oThread.IsBackground = true;
                 oThread.Start();
@@ -72,21 +79,25 @@ namespace EtherCOM
                     string Text = "";
                     buffer_read = new byte[10];
                     clientStreamReading.ReadTimeout = 100;
+                    // Czytanie danych ze strumienia
                     clientStreamReading.Read(buffer_read, 0, buffer_read.Length);
                     foreach (byte c in buffer_read)
                         Text += (char)c;
+                    // Odwołanie się do wątku głównego
                     TcpReceived.Invoke(new Action(delegate() { TcpReceived.AppendText(Text); }));
                 }
-                catch (System.IO.IOException)
+                catch (System.IO.IOException) // Przechwycenie TimeOuta
                 {
                     try
                     {
+                        // Zamknięcie bieżącego połączenia
                         clientReading.Close();
                         clientReading = new TcpClient();
+                        // Próba nawiązania ponownego połączenia
                         clientReading.Connect(serverEndPointReading);
                         clientStreamReading = clientReading.GetStream();
                     }
-                    catch (Exception e)
+                    catch (Exception e) // Przechwycenie nie udanej próby ponownego połączenia
                     {
                         TcpReceived.Invoke(new Action(delegate() { TcpReceivedAppendText(e.Message, Color.Red); }));
                         Connected = false;
@@ -102,6 +113,7 @@ namespace EtherCOM
             {
                 TcpReceivedAppendText(TcpSend.Text, Color.HotPink);
                 byte[] bytes_write;
+                // Przypadek gdy wybrano Dec
                 if( SendType.SelectedIndex == 0)
                 {
                     bytes_write = new byte[4];
@@ -115,6 +127,7 @@ namespace EtherCOM
                         TcpReceivedAppendText(ex.Message, Color.Red);
                     }                               
                 }
+                // Przypadek gdy wybrano Hex
                 else if (SendType.SelectedIndex == 1)
                 {
                     bytes_write = new byte[4];
@@ -128,12 +141,15 @@ namespace EtherCOM
                         TcpReceivedAppendText(ex.Message, Color.Red);
                     }   
                 }
+                // Przypadek gdy wybrano Text
                 else if (SendType.SelectedIndex == 2)
                 {
+                    // Dzielenie danych na paczki
                     int NumOfPacks = TcpSend.Text.Length / 8;
                     int LastPack = TcpSend.Text.Length % 8;
                     if (NumOfPacks > 0)
                     {
+                        // Wysyłanie paczek po 8 bajtów
                         bytes_write = new byte[8];
                         for (int i = 0; i < NumOfPacks; i++)
                         {
@@ -157,6 +173,7 @@ namespace EtherCOM
         {
             try
             {
+                // Próba wysłania danych do strumienia
                 clientStream.Write(bytes_write, 0, bytes_write.Length);
             }
             catch (Exception e)
